@@ -7,18 +7,6 @@ import sys
 import tkinter as tk
 from tkinter import filedialog
 
-mod = None
-cont = None
-top = (0,0)
-bottom = (0,0)
-positions = []
-values = []
-slope = 0
-width = 0
-height = 0
-label_text = ""
-
-
 # INTERPRET SCANTRON VALUE
 def single(values):
     for i, value in enumerate(reversed(values)):
@@ -28,15 +16,21 @@ def single(values):
 def multiple(values):
     tmp = ""
     for i, value in enumerate(values, start=1):
-        tmp += str(i) + "/" if value else ""
+        tmp += (str(i) + "/") if value else ""
     return tmp[:-1] + ","
 def binary(values):
     return str(sum(2**i for i, v in enumerate(values) if v)) + ","
 def tf(values):
     return str(values[0]) + ","
+def custom(values, list_options):
+    list_options = list_options.split(",")
+    tmp = ""
+    for i, value in enumerate(values):
+        tmp += (list_options[i] + "/") if value else ""
+    return tmp[:-1] + ","
 
 # DRAW DOT ON IMAGE, ADD POSITION TO LIST
-def drawdot(x, y, cont, flag):
+def draw_dot(x, y, cont, flag):
     global mod, positions, values, slope, width, height
 
     x_ = x + .5
@@ -59,7 +53,7 @@ def click(event, x, y, flags, param):
                 min = math.sqrt((p[2]-x)**2 + (p[3]-y)**2)
                 minp = (p[0], p[1])
         values[minp[1]][minp[0]] = not values[minp[1]][minp[0]]
-        drawdot(minp[0], minp[1], cont, False)
+        draw_dot(minp[0], minp[1], cont, False)
         cv2.imshow('img', cont)
 
 # IMPORT AND PROCESS IMAGE
@@ -67,8 +61,11 @@ def process():
     global mod, cont, top, bottom, positions, values, slope, width, height, label_text
 
     # IMPORT IMAGE
-    # tk.Tk().withdraw()
-    img = cv2.imread(filedialog.askopenfilename(), cv2.IMREAD_GRAYSCALE)
+    try:
+        img = cv2.imread(filedialog.askopenfilename(), cv2.IMREAD_GRAYSCALE)
+    except:
+        label_text = "Data not entered."
+        return
     if np.shape(img)[1] > tk.Tk().winfo_screenheight():
         img = cv2.resize(img, None, fx=tk.Tk().winfo_screenheight() / np.shape(img)[1] * .8,
                          fy=tk.Tk().winfo_screenheight() / np.shape(img)[1] * .8, interpolation=cv2.INTER_CUBIC)
@@ -112,7 +109,7 @@ def process():
     for y in range(18):
         tmp = []
         for x in range(13):
-            drawdot(x, y, cont, True)
+            draw_dot(x, y, cont, True)
 
     # SHOW IMAGE, WAIT FOR CORRECTIONS
     cv2.imshow('img', cont)
@@ -131,30 +128,56 @@ def process():
     match = sum(2 ** i for i, v in enumerate(values[1]) if v)
 
     # READ CONFIGURATION DATA
-    config = configparser.ConfigParser()
-    config.read("config.ini")
+    try:
+        config = configparser.ConfigParser()
+        config.read("config.ini")
+        config_file = config["DEFAULT"]["data_file"]
+        config_file = config_file[(1 if config_file[0] == '/' else 0):]
+    except:
+        label_text = "Config file missing/invalid."
+        return
 
     # WRITE TO DATA FILE
-    exists = Path(str(team) + ".csv").is_file()
-    with open(str(team) + ".csv", "a+") as file:
-        if not exists:
-            file.write(str(team) + "\nMatch,")
-            for i, name in dict(config.items("names")).items():
-                file.write(name + ",")
+    try:
+        single_file = "." in config_file
+        file_path = config_file + ("" if single_file else (str(team) + ".csv"))
+        exists = Path(file_path).is_file()
+        with open(file_path, "a+") as file:
+            if not exists:
+                file.write("Team,Match," if single_file else (str(team)+"\nMatch,"))
+                print(config["names"])
+                # for i, name in dict(config["names"]).items():
+                #     file.write(name + ",")
+                file.write("\n")
+            file.write(((str(team) + ",") if single_file else "") + str(match) + ",")
+            for i, value in enumerate(values[2:], start=1):
+                if config["types"][str(i)] == "Single":
+                    file.write(single(value))
+                elif config["types"][str(i)] == "Binary":
+                    file.write(binary(value))
+                elif config["types"][str(i)] == "TF":
+                    file.write(tf(value))
+                elif config["types"][str(i)] == "Multiple":
+                    file.write(multiple(value))
+                else:
+                    file.write(custom(value, config["types"][str(i)]))
             file.write("\n")
-        file.write(str(match) + ",")
-        for i, value in enumerate(values[2:], start=1):
-            if config["types"][str(i)] == "Single":
-                file.write(single(value))
-            elif config["types"][str(i)] == "Binary":
-                file.write(binary(value))
-            elif config["types"][str(i)] == "TF":
-                file.write(tf(value))
-            elif config["types"][str(i)] == "Multiple":
-                file.write(multiple(value))
-        file.write("\n")
+    except:
+        label_text = "Data file error."
+        return
     label_text = "Data successfully entered for team " + str(team) + " in match " + str(match) + "."
     print(label_text)
+
+mod = None
+cont = None
+top = (0,0)
+bottom = (0,0)
+positions = []
+values = []
+slope = 0
+width = 0
+height = 0
+label_text = ""
 
 main = tk.Tk()
 tk.Label(main, text=label_text).pack(fill=tk.X)
