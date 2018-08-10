@@ -21,7 +21,7 @@ def multiple(values):
 def binary(values):
     return str(sum(2**i for i, v in enumerate(values) if v)) + ","
 def tf(values):
-    return str(values[0]) + ","
+    return (str(values[0]) if True in values[0:2] else "") + ","
 def custom(values, list_options):
     list_options = list_options.split(",")
     tmp = ""
@@ -65,6 +65,7 @@ def process():
         img = cv2.imread(filedialog.askopenfilename(), cv2.IMREAD_GRAYSCALE)
     except:
         label_text = "Data not entered."
+        print(label_text)
         return
     if np.shape(img)[1] > tk.Tk().winfo_screenheight():
         img = cv2.resize(img, None, fx=tk.Tk().winfo_screenheight() / np.shape(img)[1] * .8,
@@ -117,9 +118,11 @@ def process():
     try:
         if cv2.waitKey() not in [13, 32]:  # SPACE OR ENTER
             label_text = "Data not entered."
+            print(label_text)
             return
     except ValueError:
         label_text = "Data not entered."
+        print(label_text)
         return
     cv2.destroyAllWindows()
 
@@ -135,6 +138,7 @@ def process():
         config_file = config_file[(1 if config_file[0] == '/' else 0):]
     except:
         label_text = "Config file missing/invalid."
+        print(label_text)
         return
 
     # WRITE TO DATA FILE
@@ -145,25 +149,25 @@ def process():
         with open(file_path, "a+") as file:
             if not exists:
                 file.write("Team,Match," if single_file else (str(team)+"\nMatch,"))
-                print(config["names"])
-                # for i, name in dict(config["names"]).items():
-                #     file.write(name + ",")
+                for i in range(1, 17):
+                    file.write(config[str(i)]["Name"] + ",")
                 file.write("\n")
             file.write(((str(team) + ",") if single_file else "") + str(match) + ",")
             for i, value in enumerate(values[2:], start=1):
-                if config["types"][str(i)] == "Single":
+                if config[str(i)]["Type"] == "Single":
                     file.write(single(value))
-                elif config["types"][str(i)] == "Binary":
+                elif config[str(i)]["Type"] == "Binary":
                     file.write(binary(value))
-                elif config["types"][str(i)] == "TF":
+                elif config[str(i)]["Type"] == "TF":
                     file.write(tf(value))
-                elif config["types"][str(i)] == "Multiple":
+                elif config[str(i)]["Type"] == "Multiple":
                     file.write(multiple(value))
                 else:
-                    file.write(custom(value, config["types"][str(i)]))
+                    file.write(custom(value, config[str(i)]["Type"]))
             file.write("\n")
     except:
         label_text = "Data file error."
+        print(label_text)
         return
     label_text = "Data successfully entered for team " + str(team) + " in match " + str(match) + "."
     print(label_text)
