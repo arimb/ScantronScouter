@@ -60,9 +60,21 @@ def click(event, x, y, flags, param):
 def process():
     global mod, cont, top, bottom, positions, values, slope, width, height, main, label_text
 
+    # OPEN CONFIG FILE
+    try:
+        config = configparser.ConfigParser()
+        config.read("config.ini")
+        image_dir = config["DEFAULT"]["Default Image Directory"]
+        image_dir = image_dir[(1 if image_dir[0] == '/' else 0):]
+    except:
+        label_text.set("Config file missing/invalid.")
+        print(label_text.get())
+        main.update()
+        return
+
     # IMPORT IMAGE
     try:
-        img = cv2.imread(filedialog.askopenfilename(), cv2.IMREAD_GRAYSCALE)
+        img = cv2.imread(filedialog.askopenfilename(initialdir=image_dir, title="Choose Image File", filetypes=(("image files", "*.jpg *.jpeg *.png *.bmp *.tiff"), ("all files", "*.*"))), cv2.IMREAD_GRAYSCALE)
         if np.shape(img)[1] > main.winfo_screenheight():
             img = cv2.resize(img, None, fx=main.winfo_screenheight() / np.shape(img)[1] * .8,
                              fy=main.winfo_screenheight() / np.shape(img)[1] * .8, interpolation=cv2.INTER_CUBIC)
@@ -135,12 +147,10 @@ def process():
 
     # READ CONFIGURATION DATA
     try:
-        config = configparser.ConfigParser()
-        config.read("config.ini")
-        config_file = config["DEFAULT"]["data_file"]
+        config_file = config["DEFAULT"]["Data File"]
         config_file = config_file[(1 if config_file[0] == '/' else 0):]
     except:
-        label_text.set("Config file missing/invalid.")
+        label_text.set("Config file invalid.")
         print(label_text.get())
         main.update()
         return
@@ -188,15 +198,13 @@ slope = 0
 width = 0
 height = 0
 
-
 main = tk.Tk()
-main.geometry("310x50+20+20")
+main.geometry('%dx%d+%d+%d' % (310, 50, (main.winfo_screenwidth()-310)/2, main.winfo_screenheight()/3-50/2))
 main.resizable(0,0)
 main.title("ScantronScouter")
 main.pack_propagate(0)
-
 label_text = tk.StringVar(main)
 tk.Label(main, textvariable=label_text, wraplength=450).pack(fill=tk.X)
-tk.Button(main, text="Add Data", command=process).pack(side=tk.LEFT)
-tk.Button(main, text="Exit", command=lambda:sys.exit(0)).pack(side=tk.RIGHT)
+tk.Button(main, text="Add Data", command=process).pack(side=tk.LEFT, padx=10)
+tk.Button(main, text="Exit", command=lambda:sys.exit(0)).pack(side=tk.LEFT, padx=5)
 tk.mainloop()
