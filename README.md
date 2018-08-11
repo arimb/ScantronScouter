@@ -23,16 +23,19 @@ Introducing ScantronScouter, the semi-paperless scouting method that only requir
 ​
 
 ## Configuration File
-###Default Image Directory
+__Default Image Directory__
+
 The relative or absolute path to the default folder containing the scantron images
 
-###Data File
+__Data File__
+
 Either a .csv file or a folder:
 
 * If a file: the scouting data for all teams will be put here
 * If a folder: a .csv file will be created for each team's scouting data in this folder
 
-###Question #
+__Question #__
+
 Name: the question's name
 
 Type: the type of question being asked
