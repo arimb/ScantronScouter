@@ -31,7 +31,7 @@ def custom(values, list_options):
 
 # DRAW DOT ON IMAGE, ADD POSITION TO LIST
 def draw_dot(x, y, cont, flag):
-    global mod, positions, values, slope, width, height
+    global mod, positions, values, slope, width, height, main, label_text
 
     x_ = x + .5
     y_ = y + (1.5 if slope < 0 else .5)
@@ -58,18 +58,19 @@ def click(event, x, y, flags, param):
 
 # IMPORT AND PROCESS IMAGE
 def process():
-    global mod, cont, top, bottom, positions, values, slope, width, height, label_text
+    global mod, cont, top, bottom, positions, values, slope, width, height, main, label_text
 
     # IMPORT IMAGE
     try:
         img = cv2.imread(filedialog.askopenfilename(), cv2.IMREAD_GRAYSCALE)
+        if np.shape(img)[1] > main.winfo_screenheight():
+            img = cv2.resize(img, None, fx=main.winfo_screenheight() / np.shape(img)[1] * .8,
+                             fy=main.winfo_screenheight() / np.shape(img)[1] * .8, interpolation=cv2.INTER_CUBIC)
     except:
-        label_text = "Data not entered."
-        print(label_text)
+        label_text.set("Data not entered.")
+        print(label_text.get())
+        main.update()
         return
-    if np.shape(img)[1] > tk.Tk().winfo_screenheight():
-        img = cv2.resize(img, None, fx=tk.Tk().winfo_screenheight() / np.shape(img)[1] * .8,
-                         fy=tk.Tk().winfo_screenheight() / np.shape(img)[1] * .8, interpolation=cv2.INTER_CUBIC)
 
     # THRESHOLD CALIBRATION BARS AND ANSWERS
     thresh1 = cv2.inRange(img, 0, 60)
@@ -117,12 +118,14 @@ def process():
     cv2.setMouseCallback('img', click)
     try:
         if cv2.waitKey() not in [13, 32]:  # SPACE OR ENTER
-            label_text = "Data not entered."
-            print(label_text)
+            label_text.set("Data not entered.")
+            print(label_text.get())
+            main.update()
             return
     except ValueError:
-        label_text = "Data not entered."
-        print(label_text)
+        label_text.set("Data not entered.")
+        print(label_text.get())
+        main.update()
         return
     cv2.destroyAllWindows()
 
@@ -137,8 +140,9 @@ def process():
         config_file = config["DEFAULT"]["data_file"]
         config_file = config_file[(1 if config_file[0] == '/' else 0):]
     except:
-        label_text = "Config file missing/invalid."
-        print(label_text)
+        label_text.set("Config file missing/invalid.")
+        print(label_text.get())
+        main.update()
         return
 
     # WRITE TO DATA FILE
@@ -166,11 +170,13 @@ def process():
                     file.write(custom(value, config[str(i)]["Type"]))
             file.write("\n")
     except:
-        label_text = "Data file error."
-        print(label_text)
+        label_text.set("Data file error.")
+        print(label_text.get())
+        main.update()
         return
-    label_text = "Data successfully entered for team " + str(team) + " in match " + str(match) + "."
-    print(label_text)
+    label_text.set("Data successfully entered for team " + str(team) + " in match " + str(match) + ".")
+    print(label_text.get())
+    main.update()
 
 mod = None
 cont = None
@@ -181,10 +187,16 @@ values = []
 slope = 0
 width = 0
 height = 0
-label_text = ""
+
 
 main = tk.Tk()
-tk.Label(main, text=label_text).pack(fill=tk.X)
+main.geometry("310x50+20+20")
+main.resizable(0,0)
+main.title("ScantronScouter")
+main.pack_propagate(0)
+
+label_text = tk.StringVar(main)
+tk.Label(main, textvariable=label_text, wraplength=450).pack(fill=tk.X)
 tk.Button(main, text="Add Data", command=process).pack(side=tk.LEFT)
 tk.Button(main, text="Exit", command=lambda:sys.exit(0)).pack(side=tk.RIGHT)
 tk.mainloop()
