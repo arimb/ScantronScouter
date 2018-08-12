@@ -5,7 +5,7 @@ Introducing ScantronScouter, the semi-paperless scouting method that only requir
 1. Before the event starts:
     * Print a few lists of questions for the scouts to answer for each team in each match
     * Edit configuration file with file location settings and scouting question data
-    * Print a lot of scantron pages
+    * Print a lot of [scantron pages](scantron.png)
     * Cut each page into 4 scantron sheets
 2. At the event:
     * Before each match, scouts enter team and match number by “bubbling in” their binary representations
@@ -13,7 +13,7 @@ Introducing ScantronScouter, the semi-paperless scouting method that only requir
     * After the match, the lead scouter -
         * collects the scantron sheets
         * scans them onto the computer as images using the flatbed scanner
-        * clicks "Add Data" in the ScantronScouter program
+        * clicks "Add Data" in the [ScantronScouter program](ScantronScouter.exe)
         * selects the image of the latest scantron sheet
         * checks to make sure all of the dots over the "bubbled in" boxes are green and non-"bubbled in" boxes are purple (click to flip)
         * hits the enter button or space bar (any other key to exit without saving data)
@@ -22,7 +22,7 @@ Introducing ScantronScouter, the semi-paperless scouting method that only requir
     * To clear the scouting data, simply delete the spreadsheet file(s)
 ​
 
-## Configuration File
+## [Configuration File](config.ini)
 __Default Image Directory__
 
 The relative or absolute path to the default folder containing the scantron images

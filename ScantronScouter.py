@@ -68,7 +68,6 @@ def process():
         image_dir = image_dir[(1 if image_dir[0] == '/' else 0):]
     except:
         label_text.set("Config file missing/invalid.")
-        print(label_text.get())
         main.update()
         return
 
@@ -80,7 +79,6 @@ def process():
                              fy=main.winfo_screenheight() / np.shape(img)[1] * .8, interpolation=cv2.INTER_CUBIC)
     except:
         label_text.set("Data not entered.")
-        print(label_text.get())
         main.update()
         return
 
@@ -131,12 +129,10 @@ def process():
     try:
         if cv2.waitKey() not in [13, 32]:  # SPACE OR ENTER
             label_text.set("Data not entered.")
-            print(label_text.get())
             main.update()
             return
     except ValueError:
         label_text.set("Data not entered.")
-        print(label_text.get())
         main.update()
         return
     cv2.destroyAllWindows()
@@ -151,13 +147,13 @@ def process():
         config_file = config_file[(1 if config_file[0] == '/' else 0):]
     except:
         label_text.set("Config file invalid.")
-        print(label_text.get())
         main.update()
         return
 
     # WRITE TO DATA FILE
     try:
         single_file = "." in config_file
+        config_file += "" if single_file else "/" if config_file[-1] != "/" else ""
         file_path = config_file + ("" if single_file else (str(team) + ".csv"))
         exists = Path(file_path).is_file()
         with open(file_path, "a+") as file:
@@ -168,24 +164,22 @@ def process():
                 file.write("\n")
             file.write(((str(team) + ",") if single_file else "") + str(match) + ",")
             for i, value in enumerate(values[2:], start=1):
-                if config[str(i)]["Type"] == "Single":
+                if config["Question " + str(i)]["Type"] == "Single":
                     file.write(single(value))
-                elif config[str(i)]["Type"] == "Binary":
+                elif config["Question " + str(i)]["Type"] == "Binary":
                     file.write(binary(value))
-                elif config[str(i)]["Type"] == "TF":
+                elif config["Question " + str(i)]["Type"] == "TF":
                     file.write(tf(value))
-                elif config[str(i)]["Type"] == "Multiple":
+                elif config["Question " + str(i)]["Type"] == "Multiple":
                     file.write(multiple(value))
                 else:
-                    file.write(custom(value, config[str(i)]["Type"]))
+                    file.write(custom(value, config["Question " + str(i)]["Type"]))
             file.write("\n")
     except:
         label_text.set("Data file error.")
-        print(label_text.get())
         main.update()
         return
     label_text.set("Data successfully entered for team " + str(team) + " in match " + str(match) + ".")
-    print(label_text.get())
     main.update()
 
 mod = None
@@ -203,7 +197,7 @@ main.geometry('%dx%d+%d+%d' % (310, 50, (main.winfo_screenwidth()-310)/2, main.w
 main.resizable(0,0)
 main.title("ScantronScouter")
 main.pack_propagate(0)
-label_text = tk.StringVar(main)
+label_text = tk.StringVar(main, value="Click \"Add Data\" to begin.")
 tk.Label(main, textvariable=label_text, wraplength=450).pack(fill=tk.X)
 tk.Button(main, text="Add Data", command=process).pack(side=tk.LEFT, padx=10)
 tk.Button(main, text="Exit", command=lambda:sys.exit(0)).pack(side=tk.LEFT, padx=5)
