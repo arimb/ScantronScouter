@@ -1,6 +1,10 @@
 # ScantronScouter
 Introducing ScantronScouter, the semi-paperless scouting method that only requires a single computer and flatbed scanner.
 
+__Sample Screenshot__
+
+![alt text](Screenshot.JPG "Screenshot")
+
 ## Installation
 1. Download a [zip file](https://github.com/arimb/ScantronScouter/archive/master.zip) of the repo from GitHub
 2. Unzip
