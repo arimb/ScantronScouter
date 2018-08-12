@@ -1,6 +1,13 @@
 # ScantronScouter
 Introducing ScantronScouter, the semi-paperless scouting method that only requires a single computer and flatbed scanner.
 
+##Installation
+1. Download a [zip file](https://github.com/arimb/ScantronScouter/archive/master.zip) of the repo from GitHub
+2. Unzip
+3. Configure the config.ini file in the text editor of your choice
+4. Run ScantronScouter.exe
+5. Enjoy!
+
 ## How It Works
 1. Before the event starts:
     * Print a few lists of questions for the scouts to answer for each team in each match
