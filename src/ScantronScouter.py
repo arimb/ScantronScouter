@@ -64,7 +64,7 @@ def process():
     try:
         config = configparser.ConfigParser()
         config.read("config.ini")
-        image_dir = config["DEFAULT"]["Default Image Directory"]
+        image_dir = config["DEFAULT"]["Default_Image_Directory"]
         image_dir = image_dir[(1 if image_dir[0] == '/' else 0):]
     except:
         label_text.set("Config file missing/invalid.")
@@ -143,7 +143,7 @@ def process():
 
     # READ CONFIGURATION DATA
     try:
-        config_file = config["DEFAULT"]["Data File"]
+        config_file = config["DEFAULT"]["Data_File"]
         config_file = config_file[(1 if config_file[0] == '/' else 0):]
     except:
         label_text.set("Config file invalid.")
