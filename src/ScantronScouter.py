@@ -63,7 +63,7 @@ def process():
     # OPEN CONFIG FILE
     try:
         config = configparser.ConfigParser()
-        config.read("config.ini")
+        config.read("../config.ini")
         image_dir = config["DEFAULT"]["Default_Image_Directory"]
         image_dir = image_dir[(1 if image_dir[0] == '/' else 0):]
     except:
@@ -126,16 +126,28 @@ def process():
     # SHOW IMAGE, WAIT FOR CORRECTIONS
     cv2.imshow('img', cont)
     cv2.setMouseCallback('img', click)
-    try:
-        if cv2.waitKey() not in [13, 32]:  # SPACE OR ENTER
-            label_text.set("Data not entered.")
-            main.update()
-            return
-    except ValueError:
-        label_text.set("Data not entered.")
-        main.update()
-        return
-    cv2.destroyAllWindows()
+    while True:
+        try:
+            a = cv2.waitKey(20)
+            if cv2.getWindowProperty("img", 0) == -1:   # CHECK WINDOW CLOSED
+                label_text.set("Data not entered.")
+                main.update()
+                cv2.destroyAllWindows()
+                return
+            if a in [13, 32]:  # SPACE OR ENTER
+                cv2.destroyAllWindows()
+                break
+            elif a == 27:    # ESC
+                label_text.set("Data not entered.")
+                main.update()
+                cv2.destroyAllWindows()
+                return
+        except ValueError:
+            pass
+            # label_text.set("Data not entered.")
+            # main.update()
+            # cv2.destroyAllWindows()
+            # return
 
     # READ TEAM, MATCH NUMBER
     team = sum(2 ** i for i, v in enumerate(values[0]) if v)

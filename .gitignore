@@ -1,6 +1,7 @@
 /data/
 /.idea/
 data.csv
-/__pycache__/
+*/__pycache__/
 /build/
 *.spec
+*.ico
