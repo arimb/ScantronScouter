@@ -16,22 +16,21 @@ for x in [0,1]:
             cv2.putText(img, str(i), (64+40*i-(10 if i>9 else 0) + x*WIDTH, 24 + y*HEIGHT), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, 0)
 
         # DRAW DS LOCATIONS
-        for i, l in enumerate(["R1", "R2", "R3", "L1", "L2", "L3"]):
-            cv2.putText(img, l, (60+40*i + x*WIDTH, 90 + y*HEIGHT), cv2.FONT_HERSHEY_PLAIN, 1, 130)
-        cv2.putText(img, "R", (464 + x*WIDTH, 90 + y*HEIGHT), cv2.FONT_HERSHEY_PLAIN, 1, 130)
-        cv2.putText(img, "C", (544 + x*WIDTH, 90 + y*HEIGHT), cv2.FONT_HERSHEY_PLAIN, 1, 130)
+        for i, l in enumerate(["R1", "R2", "R3", "B1", "B2", "B3"]):
+            cv2.putText(img, l, (60+40*i + x*WIDTH, 90 + y*HEIGHT), cv2.FONT_HERSHEY_PLAIN, 1, 0)
+        cv2.putText(img, "R", (304 + x*WIDTH, 90 + y*HEIGHT), cv2.FONT_HERSHEY_PLAIN, 1, 0)
+        cv2.putText(img, "C", (464 + x*WIDTH, 130 + y*HEIGHT), cv2.FONT_HERSHEY_PLAIN, 1, 0)
 
         # DRAW CALIBRATION STRIPS
         cv2.rectangle(img, (54 + x*WIDTH, 30 + y*HEIGHT), (54+40*13-4 + x*WIDTH, 30+30 + y*HEIGHT), 130, -1)
         cv2.rectangle(img, (54 + x*WIDTH, 790 + y*HEIGHT), (54+40*13-4 + x*WIDTH, 790+30 + y*HEIGHT), 130, -1)
 
         # DRAW SQUARES
-        for i in range(54, 54+40*13, 40):
-            for j in range(70, 70+40*18, 40):
+        for j in range(70, 70+40*18, 40):
+            for i in range(54, 54+40*(7 if j==70 else 11 if j==110 else 10 if j==150 else 13), 40):
                 cv2.rectangle(img, (i + x*WIDTH, j + y*HEIGHT), (i+30 + x*WIDTH, j+30 + y*HEIGHT), 0, 1)
 
         # DRAW Y NUMBERS
-        # cv2.putText(img, "T", (30 + x*WIDTH, 92 + y*HEIGHT), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, 0)
         cv2.putText(img, "_0", (13 + x*WIDTH, 132 + y*HEIGHT), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, 0)
         cv2.putText(img, "0_", (13 + x * WIDTH, 172 + y * HEIGHT), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, 0)
         for i in range(1, 16):

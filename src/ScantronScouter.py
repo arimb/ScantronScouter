@@ -36,7 +36,7 @@ def draw_dot(x, y, cont, flag):
     x_ = x + .5
     y_ = y + (1.5 if slope < 0 else .5)
     x0 = top[0] + int(math.sin(slope)*height/19*y_ + math.cos(-slope)*width/13*x_)
-    y0 = top[1] + int(math.cos(slope)*height/19*y_ + (bottom[3] if slope > 0 else 0) + math.sin(-slope)*width/13*x_)
+    y0 = top[1] + int(math.cos(slope)*height/19*y_ + (bottom[3] if slope > -0.05 else 0) + math.sin(-slope)*width/13*x_)
     if flag:
         positions.append((x, y, x0, y0))
         values[y][x] = mod[y0, x0] > 20
@@ -58,18 +58,7 @@ def click(event, x, y, flags, param):
 
 # IMPORT AND PROCESS IMAGE
 def process():
-    global mod, cont, top, bottom, positions, values, slope, width, height, main, label_text
-
-    # OPEN CONFIG FILE
-    try:
-        config = configparser.ConfigParser()
-        config.read("../config.ini")
-        image_dir = config["DEFAULT"]["Default_Image_Directory"]
-        image_dir = image_dir[(1 if image_dir[0] == '/' else 0):]
-    except:
-        label_text.set("Config file missing/invalid.")
-        main.update()
-        return
+    global mod, cont, top, bottom, positions, values, slope, width, height, main, label_text, config_file
 
     # IMPORT IMAGE
     try:
@@ -106,13 +95,13 @@ def process():
     height = (bottom[1] - top[1]) / math.cos(slope)
 
     cont = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
-    # cont = cv2.rectangle(cont, (top[0], top[1]), (top[0]+top[2], top[1]+top[3]), (0,255,0))
-    # cont = cv2.rectangle(cont, (bottom[0], bottom[1]), (bottom[0]+bottom[2], bottom[1]+bottom[3]), (0,0,255))
-    cont = cv2.line(cont, (top[0], top[1] + (top[3] if slope > 0 else 0)), (
-    top[0] + int(math.cos(-slope) * width), top[1] + int(math.sin(-slope) * width) + (top[3] if slope > 0 else 0)),
+    cont = cv2.rectangle(cont, (top[0], top[1]), (top[0]+top[2], top[1]+top[3]), (0,255,0))
+    cont = cv2.rectangle(cont, (bottom[0], bottom[1]), (bottom[0]+bottom[2], bottom[1]+bottom[3]), (0,0,255))
+    cont = cv2.line(cont, (top[0], top[1] + (top[3] if slope > -0.05 else 0)), (
+    top[0] + int(math.cos(-slope) * width), top[1] + int(math.sin(-slope) * width) + (top[3] if slope > -0.05 else 0)),
                     (255, 0, 0), 2)
-    cont = cv2.line(cont, (top[0], top[1] + (top[3] if slope > 0 else 0)), (
-    int(top[0] + math.sin(slope) * height), int(top[1] + math.cos(slope) * height) + (bottom[3] if slope > 0 else 0)),
+    cont = cv2.line(cont, (top[0], top[1] + (top[3] if slope > -0.05 else 0)), (
+    int(top[0] + math.sin(slope) * height), int(top[1] + math.cos(slope) * height) + (bottom[3] if slope > -0.05 else 0)),
                     (255, 0, 0), 2)
 
     # READ ANSWERS
@@ -150,32 +139,22 @@ def process():
             # return
 
     # READ TEAM, MATCH NUMBER
-    team = sum(2 ** i for i, v in enumerate(values[0]) if v)
-    match = sum(2 ** i for i, v in enumerate(values[1]) if v)
-
-    # READ CONFIGURATION DATA
-    try:
-        config_file = config["DEFAULT"]["Data_File"]
-        config_file = config_file[(1 if config_file[0] == '/' else 0):]
-    except:
-        label_text.set("Config file invalid.")
-        main.update()
-        return
+    match = int(single(values[2][:10])[:-1]) + int(single(values[1][:10])[:-1])*10 + (100 if values[1][10] else 0)
+    position = int(single(values[0][:6])[:-1])
+    team = matches[match][position]
 
     # WRITE TO DATA FILE
     try:
-        single_file = "." in config_file
-        config_file += "" if single_file else "/" if config_file[-1] != "/" else ""
-        file_path = config_file + ("" if single_file else (str(team) + ".csv"))
+        file_path = config_file + ("" if single_file else (str(team)+".csv"))
         exists = Path(file_path).is_file()
         with open(file_path, "a+") as file:
             if not exists:
                 file.write("Team,Match," if single_file else (str(team)+"\nMatch,"))
                 for i in range(1, 17):
-                    file.write(config[str(i)]["Name"] + ",")
+                    file.write(config["Question "+str(i)]["Name"] + ",")
                 file.write("\n")
-            file.write(((str(team) + ",") if single_file else "") + str(match) + ",")
-            for i, value in enumerate(values[2:], start=1):
+            file.write(((str(team) + ",") if single_file else "") + str(match) + "," + ["R1","R2","R3","B1","B2","B3"][position] + ",")
+            for i, value in enumerate(values[3:], start=1):
                 if config["Question " + str(i)]["Type"] == "Single":
                     file.write(single(value))
                 elif config["Question " + str(i)]["Type"] == "Binary":
@@ -213,4 +192,31 @@ label_text = tk.StringVar(main, value="Click \"Add Data\" to begin.")
 tk.Label(main, textvariable=label_text, wraplength=450).pack(fill=tk.X)
 tk.Button(main, text="Add Data", command=process).pack(side=tk.LEFT, padx=10)
 tk.Button(main, text="Exit", command=lambda:sys.exit(0)).pack(side=tk.LEFT, padx=5)
+
+# OPEN CONFIG FILE
+config = configparser.ConfigParser()
+try:
+    config.read("../config.ini")
+    image_dir = config["DEFAULT"]["Default_Image_Directory"]
+    image_dir = image_dir[(1 if image_dir[0] == '/' else 0):]
+
+    config_file = config["DEFAULT"]["Data_File"]
+    config_file = config_file[(1 if config_file[0] == '/' else 0):]
+    single_file = "." in config_file
+    config_file += "/" if not single_file and config_file[-1] not in ["/", "\\"] else ""
+except:
+    label_text.set("Config file missing/invalid.")
+    main.update()
+
+# READ TBA DATA FROM FILE
+with open(config["DEFAULT"]["TBA_DATA_FILE"]) as file:
+    lines = [(line[:-1].split(",")) for line in file.readlines()]
+    event = lines[0][0]
+    if event != config["DEFAULT"]["EventKey"]:
+        label_text.set("Event data is stale.")
+        main.update()
+    matches = {}
+    for l in lines[2:]:
+        matches[int(l[0])] = l[1:]
+
 tk.mainloop()
