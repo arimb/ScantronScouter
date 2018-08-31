@@ -20,7 +20,7 @@ __Sample Screenshot__
     * Cut each page into 4 scantron sheets
     * Run the [TBA Puller](TBAPuller.exe) once match assignments have been made to populate the local match schedule
 2. At the event:
-    * Before each match, scouts enter team and match number by “bubbling in” their binary representations
+    * Before each match, scouts enter the match by bubbling in the ones and tens digit, and the team by its driver station position
     * During the match, scouts enter the answers to the questions by “bubbling in” the corresponding boxes
     * After the match, the lead scouter -
         * collects the scantron sheets
