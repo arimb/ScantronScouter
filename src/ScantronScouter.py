@@ -68,7 +68,6 @@ def process():
                              fy=main.winfo_screenheight() / np.shape(img)[1] * .8, interpolation=cv2.INTER_CUBIC)
     except:
         label_text.set("Data not entered.")
-        main.update()
         return
 
     # THRESHOLD CALIBRATION BARS AND ANSWERS
@@ -119,7 +118,6 @@ def process():
             a = cv2.waitKey(20)
             if cv2.getWindowProperty("img", 0) == -1:   # CHECK WINDOW CLOSED
                 label_text.set("Data not entered.")
-                main.update()
                 cv2.destroyAllWindows()
                 return
             if a in [13, 32]:  # SPACE OR ENTER
@@ -127,7 +125,6 @@ def process():
                 break
             elif a == 27:    # ESC
                 label_text.set("Data not entered.")
-                main.update()
                 cv2.destroyAllWindows()
                 return
         except ValueError:
@@ -163,11 +160,10 @@ def process():
                     file.write(custom(value, config["Question " + str(i)]["Type"]))
             file.write("\n")
     except:
+        add.config(state='disabled')
         label_text.set("Data file error.")
-        main.update()
         return
     label_text.set("Data successfully entered for team " + str(team) + " in match " + str(match) + ".")
-    main.update()
 
 mod = None
 cont = None
@@ -186,7 +182,8 @@ main.title("ScantronScouter")
 main.pack_propagate(0)
 label_text = tk.StringVar(main, value="Click \"Add Data\" to begin.")
 tk.Label(main, textvariable=label_text, wraplength=450).pack(fill=tk.X)
-tk.Button(main, text="Add Data", command=process).pack(side=tk.LEFT, padx=10)
+add = tk.Button(main, text="Add Data", command=process)
+add.pack(side=tk.LEFT, padx=10)
 tk.Button(main, text="Exit", command=lambda:sys.exit(0)).pack(side=tk.LEFT, padx=5)
 
 # OPEN CONFIG FILE
@@ -201,18 +198,22 @@ try:
     single_file = "." in config_file
     config_file += "/" if not single_file and config_file[-1] not in ["/", "\\"] else ""
 except:
+    add.config(state='disabled')
     label_text.set("Config file missing/invalid.")
-    main.update()
 
 # READ TBA DATA FROM FILE
-with open(config["DEFAULT"]["TBA_DATA_FILE"]) as file:
-    lines = [(line[:-1].split(",")) for line in file.readlines()]
-    event = lines[0][0]
-    if event != config["DEFAULT"]["EventKey"]:
-        label_text.set("Event data does not match the event in the config file.")
-        main.update()
-    matches = {}
-    for l in lines[2:]:
-        matches[int(l[0])] = l[1:]
+try:
+    with open(config["DEFAULT"]["TBA_DATA_FILE"]) as file:
+        lines = [(line[:-1].split(",")) for line in file.readlines()]
+        event = lines[0][0]
+        if event != config["DEFAULT"]["EventKey"]:
+            add.config(state='disabled')
+            label_text.set("Event data does not match the event in the config file.")
+        matches = {}
+        for l in lines[2:]:
+            matches[int(l[0])] = l[1:]
+except:
+    add.config(state='disabled')
+    label_text.set("TBA Data File not present.")
 
 tk.mainloop()
