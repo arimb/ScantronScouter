@@ -46,6 +46,14 @@ Either a .csv file or a folder:
 * If a file: the scouting data for all teams will be put here
 * If a folder: a .csv file will be created for each team's scouting data in this folder
 
+__Event Key__
+
+The TBA key for the event being scouted. This is used both by TBAPuller to download the event match schedule, and by ScantronScouter to ensure that the local match schedule has been properly updated for the current event.
+
+__TBA Data File__
+
+The relative or absolute path to the text file containing the local match schedule as pulled from TBA. This location is both where TBAPuller saves the information, and where ScantronScouter looks for the information.
+
 __Question #__
 
 Name: the question's name
