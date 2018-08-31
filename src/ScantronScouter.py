@@ -36,7 +36,7 @@ def draw_dot(x, y, cont, flag):
     x_ = x + .5
     y_ = y + (1.5 if slope < 0 else .5)
     x0 = top[0] + int(math.sin(slope)*height/19*y_ + math.cos(-slope)*width/13*x_)
-    y0 = top[1] + int(math.cos(slope)*height/19*y_ + (bottom[3] if slope > -0.05 else 0) + math.sin(-slope)*width/13*x_)
+    y0 = top[1] + int(math.cos(slope)*height/19*y_ + (bottom[3] if slope > -0.01 else 0) + math.sin(-slope)*width/13*x_)
     if flag:
         positions.append((x, y, x0, y0))
         values[y][x] = mod[y0, x0] > 20
@@ -94,13 +94,13 @@ def process():
     height = (bottom[1] - top[1]) / math.cos(slope)
 
     cont = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
-    cont = cv2.rectangle(cont, (top[0], top[1]), (top[0]+top[2], top[1]+top[3]), (0,255,0))
-    cont = cv2.rectangle(cont, (bottom[0], bottom[1]), (bottom[0]+bottom[2], bottom[1]+bottom[3]), (0,0,255))
-    cont = cv2.line(cont, (top[0], top[1] + (top[3] if slope > -0.05 else 0)), (
-    top[0] + int(math.cos(-slope) * width), top[1] + int(math.sin(-slope) * width) + (top[3] if slope > -0.05 else 0)),
+    # cont = cv2.rectangle(cont, (top[0], top[1]), (top[0]+top[2], top[1]+top[3]), (0,255,0))
+    # cont = cv2.rectangle(cont, (bottom[0], bottom[1]), (bottom[0]+bottom[2], bottom[1]+bottom[3]), (0,0,255))
+    cont = cv2.line(cont, (top[0], top[1]+(top[3] if slope>-0.01 else 0)),
+                    (top[0]+int(math.cos(-slope)*width), top[1]+int(math.sin(-slope)*width)+(top[3] if slope>-0.01 else 0)),
                     (255, 0, 0), 2)
-    cont = cv2.line(cont, (top[0], top[1] + (top[3] if slope > -0.05 else 0)), (
-    int(top[0] + math.sin(slope) * height), int(top[1] + math.cos(slope) * height) + (bottom[3] if slope > -0.05 else 0)),
+    cont = cv2.line(cont, (top[0], top[1]+(top[3] if slope>-0.01 else 0)),
+                    (int(top[0]+math.sin(slope)*height), int(top[1]+math.cos(slope)*height)+(bottom[3] if slope>-0.01 else 0)),
                     (255, 0, 0), 2)
 
     # READ ANSWERS

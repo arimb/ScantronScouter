@@ -2,6 +2,7 @@
 /.idea/
 data.csv
 */__pycache__/
-/build/
+*/build/
+*/dist/
 *.spec
 *.ico

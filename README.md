@@ -15,9 +15,10 @@ __Sample Screenshot__
 ## How It Works
 1. Before the event starts:
     * Print a few lists of questions for the scouts to answer for each team in each match
-    * Edit configuration file with file location settings and scouting question data
+    * Edit configuration file with event key, file location settings and scouting question data
     * Print a lot of [scantron pages](scantron.png)
     * Cut each page into 4 scantron sheets
+    * Run the [TBA Puller](TBAPuller.exe) once match assignments have been made to populate the local match schedule
 2. At the event:
     * Before each match, scouts enter team and match number by “bubbling in” their binary representations
     * During the match, scouts enter the answers to the questions by “bubbling in” the corresponding boxes
