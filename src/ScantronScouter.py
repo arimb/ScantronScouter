@@ -189,7 +189,7 @@ tk.Button(main, text="Exit", command=lambda:sys.exit(0)).pack(side=tk.LEFT, padx
 # OPEN CONFIG FILE
 config = configparser.ConfigParser()
 try:
-    config.read("../config.ini")
+    config.read("config.ini")
     image_dir = config["DEFAULT"]["Default_Image_Directory"]
     image_dir = image_dir[(1 if image_dir[0] == '/' else 0):]
 
