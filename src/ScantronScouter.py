@@ -108,7 +108,6 @@ def process():
     values = [[0 for x in range(13)] for y in range(18)]
     positions = []
     for y in range(18):
-        tmp = []
         for x in range(13):
             draw_dot(x, y, cont, True)
 
@@ -133,15 +132,12 @@ def process():
                 return
         except ValueError:
             pass
-            # label_text.set("Data not entered.")
-            # main.update()
-            # cv2.destroyAllWindows()
-            # return
 
     # READ TEAM, MATCH NUMBER
     match = int(single(values[2][:10])[:-1]) + int(single(values[1][:10])[:-1])*10 + (100 if values[1][10] else 0)
     position = int(single(values[0][:6])[:-1])
     team = matches[match][position]
+    replay = values[0][6]
 
     # WRITE TO DATA FILE
     try:
@@ -153,7 +149,7 @@ def process():
                 for i in range(1, 17):
                     file.write(config["Question "+str(i)]["Name"] + ",")
                 file.write("\n")
-            file.write(((str(team) + ",") if single_file else "") + str(match) + "," + ["R1","R2","R3","B1","B2","B3"][position] + ",")
+            file.write(((str(team) + ",") if single_file else "") + str(match) + ("R" if replay else "") + "," + ["R1","R2","R3","B1","B2","B3"][position] + ",")
             for i, value in enumerate(values[3:], start=1):
                 if config["Question " + str(i)]["Type"] == "Single":
                     file.write(single(value))
@@ -213,7 +209,7 @@ with open(config["DEFAULT"]["TBA_DATA_FILE"]) as file:
     lines = [(line[:-1].split(",")) for line in file.readlines()]
     event = lines[0][0]
     if event != config["DEFAULT"]["EventKey"]:
-        label_text.set("Event data is stale.")
+        label_text.set("Event data does not match the event in the config file.")
         main.update()
     matches = {}
     for l in lines[2:]:
